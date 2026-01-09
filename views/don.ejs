@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soutenir FOCODE - Rejoignez la Résilience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root { 
+            --primary: #000000;
+            --accent: #800020; /* FOCODE Red */
+            --green: #27ae60;   /* Trust Color */
+            --text-dark: #111111;
+            --bg-light: #fcfcfc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+        /* --- 1. HEADER STYLES (Your Custom Design) --- */
+        header { 
+            background: white; box-shadow: 0 1px 5px rgba(0,0,0,0.05); 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #eee;
+        }
+        .nav-container { 
+            max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; height: 70px;
+        }
+        .logo { font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: -1px; text-transform: uppercase; white-space: nowrap; }
+        .logo span { color: var(--accent); }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .btn-donate { 
+            background: var(--accent); color: white; padding: 10px 24px; font-weight: bold; 
+            border-radius: 4px; font-size: 13px; text-transform: uppercase; border: none; cursor: default; opacity: 0.5;
+        }
+        .btn-icon {
+            background: transparent; border: 1px solid #e0e0e0; color: #555; width: 40px; height: 40px; 
+            border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-icon:hover { background: #f9f9f9; color: var(--primary); }
+
+        /* Mobile Header */
+        @media (max-width: 768px) {
+            .nav-container { height: 55px; padding: 0 15px; }
+            .logo { font-size: 20px; }
+            .nav-right { gap: 10px; }
+            .btn-donate { padding: 6px 12px; font-size: 11px; }
+            .btn-icon { width: 32px; height: 32px; font-size: 14px; }
+        }
+
+        /* --- 2. DONATION LAYOUT --- */
+        .donate-wrapper {
+            display: grid; grid-template-columns: 1fr 480px; 
+            max-width: 1100px; margin: 40px auto; gap: 60px; padding: 0 20px;
+            align-items: start;
+        }
+
+        /* LEFT SIDE: THE PITCH */
+        .donate-pitch h1 { font-size: 42px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+        .donate-pitch p { font-size: 18px; color: #555; margin-bottom: 30px; }
+        
+        .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px; }
+        .impact-item { background: white; padding: 25px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: transform 0.3s; }
+        .impact-item:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .impact-icon { color: var(--accent); font-size: 24px; margin-bottom: 15px; }
+        .impact-title { font-weight: 700; margin-bottom: 8px; font-size: 16px; }
+        .impact-desc { font-size: 14px; color: #777; line-height: 1.5; }
+
+        /* RIGHT SIDE: THE FORM CARD */
+        .donate-card {
+            background: white; border-radius: 12px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1); 
+            padding: 35px; border-top: 6px solid var(--accent);
+            position: sticky; top: 100px;
+        }
+
+        /* TABS (Monthly vs One-Time) */
+        .freq-tabs { display: flex; background: #f0f0f0; border-radius: 6px; padding: 4px; margin-bottom: 25px; }
+        .freq-tab {
+            flex: 1; text-align: center; padding: 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.2s; font-size: 14px;
+        }
+        .freq-tab.active { background: white; color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* AMOUNT GRID */
+        .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .amount-btn {
+            border: 2px solid #eee; background: white; padding: 15px 0; 
+            border-radius: 6px; font-weight: 800; font-size: 18px; cursor: pointer; transition: 0.2s; color: #333;
+        }
+        .amount-btn:hover { border-color: #ccc; }
+        .amount-btn.selected { border-color: var(--accent); background: #fff5f5; color: var(--accent); }
+
+        /* CUSTOM INPUT */
+        .custom-link { display: block; text-align: center; font-size: 13px; color: #888; text-decoration: underline; cursor: pointer; margin-bottom: 15px; }
+        .custom-input-wrapper { display: none; margin-bottom: 20px; text-align: center; }
+        .custom-input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 120px; text-align: center; font-weight: bold; font-size: 16px; outline: none; }
+        .custom-input:focus { border-color: var(--accent); }
+
+        /* IDENTITY CARD (DYNAMIC) */
+        .identity-box {
+            background: #fdfdfd; border: 1px solid #eee; border-radius: 8px;
+            padding: 20px; margin-bottom: 25px; display: flex; gap: 15px;
+            transition: all 0.4s ease; border-left: 5px solid #ccc;
+            opacity: 1; transform: translateY(0);
+        }
+        .id-icon { font-size: 32px; display: flex; align-items: flex-start; padding-top: 2px; }
+        .id-content h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .id-content p { margin: 0; font-size: 13px; color: #555; line-height: 1.5; }
+
+        /* Tier Colors */
+        .tier-sentinelle { border-left-color: #3498db; background: #f0f8ff; } /* Blue */
+        .tier-eclaireur { border-left-color: #f1c40f; background: #fffcf0; } /* Yellow */
+        .tier-batisseur { border-left-color: #e67e22; background: #fff5eb; } /* Orange */
+        .tier-gardien { border-left-color: #27ae60; background: #f0fff4; } /* Green */
+        .tier-flambeau { border-left-color: #c0392b; background: #fff0f0; } /* Red */
+
+        /* MAIN BUTTON */
+        .submit-donation {
+            width: 100%; background: var(--accent); color: white; padding: 18px; 
+            border: none; border-radius: 6px; font-size: 18px; font-weight: 800; 
+            cursor: pointer; transition: 0.3s; letter-spacing: 1px;
+        }
+        .submit-donation:hover { background: #5a0016; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(128,0,32,0.3); }
+
+        /* SECURITY BADGES */
+        .security-badges { display: flex; justify-content: center; gap: 15px; margin-top: 25px; opacity: 0.7; align-items: center; }
+        .sec-badge { font-size: 24px; color: #555; }
+
+        @media (max-width: 900px) {
+            .donate-wrapper { grid-template-columns: 1fr; gap: 40px; }
+            .donate-card { position: relative; top: 0; order: -1; } /* Form first on mobile */
+            .donate-pitch { order: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="javascript:history.back()" class="btn-icon" title="Retour"><i class="fas fa-arrow-left"></i></a>
+            </div>
+            
+            <div style="position: absolute; left: 50%; transform: translateX(-50%);">
+                <a href="/" class="logo">FOCODE<span>.</span></a>
+            </div>
+
+            <div class="nav-right">
+                <a href="#" class="btn-donate">Donner</a>
+                </div>
+        </div>
+    </header>
+
+    <div class="donate-wrapper">
+        
+        <div class="donate-pitch">
+            <span style="color:var(--accent); font-weight:bold; text-transform:uppercase; letter-spacing:1px; font-size:12px;">Appel à l'Action</span>
+            <h1>Rejoignez les Forces<br>de la Résilience.</h1>
+            <p>
+                Depuis 2015, FOCODE opère en exil. Nous refusons les fonds gouvernementaux pour garantir notre parole libre.
+            </p>
+            <p>
+                Aujourd'hui, nous vous invitons à choisir votre rôle dans cette lutte. Ce n'est pas seulement un don, c'est une mission que vous financez.
+            </p>
+
+            <div class="impact-grid">
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-search"></i></div>
+                    <div class="impact-title">Enquêtes NDONDEZA</div>
+                    <div class="impact-desc">Financer les frais de communication sécurisée pour nos enquêteurs sur le terrain.</div>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-user-shield"></i></div>
+                    <div class="impact-title">Protection Témoins</div>
+                    <div class="impact-desc">Sécuriser l'hébergement de nos bases de données et l'anonymat des victimes.</div>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-bullhorn"></i></div>
+                    <div class="impact-title">Plaidoyer International</div>
+                    <div class="impact-desc">Produire des rapports pour alerter l'ONU et les chancelleries étrangères.</div>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-lock"></i></div>
+                    <div class="impact-title">Anonymat Total</div>
+                    <div class="impact-desc">Nous utilisons des protocoles bancaires chiffrés. Votre identité est protégée.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="donate-card">
+            
+            <h3 style="text-align:center; margin-bottom:20px; font-size:22px; font-weight:800;">Choisir votre Engagement</h3>
+
+            <div class="freq-tabs">
+                <div class="freq-tab active" id="tab-monthly" onclick="setFrequency('monthly')">Mensuel (Héros)</div>
+                <div class="freq-tab" id="tab-once" onclick="setFrequency('once')">Une fois</div>
+            </div>
+
+            <div class="amount-grid">
+                <button class="amount-btn" onclick="selectTier('sentinelle', 5)">5€</button>
+                <button class="amount-btn selected" onclick="selectTier('eclaireur', 20)">20€</button>
+                <button class="amount-btn" onclick="selectTier('batisseur', 60)">60€</button>
+                <button class="amount-btn" onclick="selectTier('gardien', 150)">150€</button>
+                <button class="amount-btn" onclick="selectTier('gardien', 300)">300€</button>
+                <button class="amount-btn" onclick="selectTier('flambeau', 500)">500€</button>
+            </div>
+
+            <div class="custom-link" onclick="toggleCustom()">Ou entrer un montant libre</div>
+            <div class="custom-input-wrapper" id="custom-wrap">
+                <input type="number" class="custom-input" placeholder="€" oninput="checkTier(this.value)">
+            </div>
+
+            <div id="identity-card" class="identity-box tier-eclaireur">
+                <div class="id-icon">🔦</div>
+                <div class="id-content">
+                    <h4 id="tier-title">Éclaireur</h4>
+                    <p id="tier-desc">
+                        Vous faites surgir la lumière là où l’on veut l’éteindre. 
+                        Vous rendez visibles les faits occultés.
+                    </p>
+                </div>
+            </div>
+
+            <button class="submit-donation">JE M'ENGAGE</button>
+
+            <div class="security-badges">
+                <i class="fab fa-stripe sec-badge" title="Stripe"></i>
+                <i class="fab fa-cc-visa sec-badge"></i>
+                <i class="fab fa-cc-mastercard sec-badge"></i>
+                <div style="font-size:11px; color:#999; line-height:1.2; text-align:left;">
+                    <i class="fas fa-lock"></i> Transaction<br>100% Sécurisée
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer style="background: #111; color: white; padding: 40px 20px; text-align: center; margin-top: 60px;">
+        <p style="color:#777; font-size:14px;">© 2025 FOCODE. Transparence et Indépendance.</p>
+    </footer>
+
+    <script>
+        // Data for Tiers
+        const tiers = {
+            sentinelle: {
+                icon: "💧",
+                title: "Sentinelle",
+                desc: "Vous êtes l’éveil discret mais essentiel. Vous veillez là où d'autres ferment les yeux."
+            },
+            eclaireur: {
+                icon: "🔦",
+                title: "Éclaireur",
+                desc: "Vous faites surgir la lumière là où l’on veut l’éteindre. Vous soutenez nos enquêtes."
+            },
+            batisseur: {
+                icon: "🏗️",
+                title: "Bâtisseur",
+                desc: "Vous construisez du concret. Vous outillez nos équipes et renforcez nos capacités terrain."
+            },
+            gardien: {
+                icon: "🛡️",
+                title: "Gardien",
+                desc: "Le rempart de la justice. Vous rendez possibles nos rapports de fond et l’assistance aux victimes."
+            },
+            flambeau: {
+                icon: "🔥",
+                title: "Flambeau",
+                desc: "Vous donnez de l’ampleur au combat. Vous éclairez la scène internationale."
+            }
+        };
+
+        // 1. Toggle Frequency
+        function setFrequency(freq) {
+            document.querySelectorAll('.freq-tab').forEach(el => el.classList.remove('active'));
+            if(freq === 'monthly') {
+                document.getElementById('tab-monthly').classList.add('active');
+                document.querySelector('.submit-donation').innerText = "JE M'ENGAGE MENSUELLEMENT";
+            } else {
+                document.getElementById('tab-once').classList.add('active');
+                document.querySelector('.submit-donation').innerText = "FAIRE UN DON UNIQUE";
+            }
+        }
+
+        // 2. Select Tier (Clicking Buttons)
+        function selectTier(tierName, amount) {
+            // Remove 'selected' from all buttons
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+            // Add 'selected' to the clicked button
+            event.target.classList.add('selected');
+            
+            // Hide custom input if open
+            document.getElementById('custom-wrap').style.display = 'none';
+
+            // Update the visual card
+            updateCard(tierName);
+        }
+
+        // 3. Toggle Custom Input
+        function toggleCustom() {
+            const wrap = document.getElementById('custom-wrap');
+            // Remove selection from buttons
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+            wrap.style.display = 'block';
+        }
+
+        // 4. Check Tier based on custom input
+        function checkTier(amount) {
+            amount = parseInt(amount);
+            let t = 'sentinelle'; // Default
+            
+            if (!amount || amount < 10) t = 'sentinelle';
+            else if (amount >= 10 && amount < 50) t = 'eclaireur';
+            else if (amount >= 50 && amount < 100) t = 'batisseur';
+            else if (amount >= 100 && amount < 500) t = 'gardien';
+            else if (amount >= 500) t = 'flambeau';
+            
+            updateCard(t);
+        }
+
+        // 5. Update the Card UI (Animation logic)
+        function updateCard(tierName) {
+            const card = document.getElementById('identity-card');
+            const data = tiers[tierName];
+
+            // Fade out
+            card.style.opacity = '0.5';
+            card.style.transform = 'translateY(5px)';
+            
+            setTimeout(() => {
+                // Update Text
+                document.querySelector('.id-icon').innerText = data.icon;
+                document.getElementById('tier-title').innerText = data.title;
+                document.getElementById('tier-desc').innerText = data.desc;
+                
+                // Update Color Class (remove old tier classes)
+                card.className = 'identity-box tier-' + tierName;
+                
+                // Fade in
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 150);
+        }
+    </script>
+</body>
+</html>

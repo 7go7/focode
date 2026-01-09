@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qui sommes-nous ? - FOCODE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CORE STYLES (MATCHING INDEX) --- */
+        :root { 
+            --primary: #000000;
+            --accent: #800020;
+            --text-dark: #111111;
+            --bg-light: #fcfcfc;
+            --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg-light); 
+            color: var(--text-dark); 
+            line-height: 1.8; 
+            opacity: 0; 
+            animation: pageFadeIn 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease, visibility 0.5s; }
+        .loader-logo { font-size: 40px; font-weight: 900; color: var(--primary); letter-spacing: -2px; animation: pulse 1.5s infinite ease-in-out; }
+        .loader-logo span { color: var(--accent); }
+        .loader-bar { width: 0%; height: 4px; background: var(--accent); margin-top: 15px; animation: loadLine 1.5s ease-in-out forwards; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pageFadeIn { to { opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(0.95); } }
+        @keyframes loadLine { 0% { width: 0; } 100% { width: 100px; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s var(--ease-out); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- LAYOUT --- */
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        img { width: 100%; height: auto; object-fit: cover; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* HEADER */
+        header { background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 900; color: var(--primary); letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+        .back-link { font-weight: bold; color: #666; font-size: 14px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
+        .back-link:hover { color: white; background: var(--primary); border-color: var(--primary); }
+
+        /* --- HERO ABOUT --- */
+        .about-hero {
+            background: linear-gradient(rgba(0,51,102,0.9), rgba(0,51,102,0.7)), url('https://focode.org/ethan/img/libert_bdi.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .about-hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 20px; }
+        .about-hero p { font-size: 20px; font-style: italic; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+
+        /* --- CONTENT SECTIONS --- */
+        .content-block { margin-bottom: 80px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        
+        .text-col h2 { font-size: 32px; color: var(--primary); margin-bottom: 20px; border-left: 5px solid var(--accent); padding-left: 15px; }
+        .text-col p { margin-bottom: 15px; font-size: 17px; color: #444; }
+        
+        .img-col img { border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+        /* --- CARDS (VISION/MISSION) --- */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .info-card { 
+            background: white; padding: 40px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+            text-align: center; transition: transform 0.3s;
+        }
+        .info-card:hover { transform: translateY(-10px); }
+        .icon-box { 
+            width: 70px; height: 70px; background: var(--bg-light); color: var(--accent); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 28px; margin: 0 auto 25px; 
+        }
+        .info-card h3 { font-size: 22px; color: var(--primary); margin-bottom: 15px; }
+
+        /* --- FORM --- */
+        .contact-form { background: white; padding: 50px; border-radius: 8px; max-width: 700px; margin: 0 auto; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 20px; }
+        .form-control { 
+            width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; background: #fcfcfc; 
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); background: white; }
+        .btn-submit { 
+            background: var(--accent); color: white; border: none; padding: 15px 40px; font-size: 16px; font-weight: bold; 
+            border-radius: 4px; cursor: pointer; transition: 0.3s; width: 100%;
+        }
+        .btn-submit:hover { background: #b01f1f; }
+
+        /* --- FOOTER --- */
+        .footer-action { background: #111; color: white; padding: 60px 20px; text-align: center; margin-top: 80px; }
+        .social-links { margin-top: 20px; font-size: 24px; }
+        .social-links a { margin: 0 10px; color: #888; }
+        .social-links a:hover { color: white; }
+
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+            .about-hero h1 { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-logo">FOCODE<span>.</span>ORG</div>
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <%- include('partials/header') %>
+
+    <section class="about-hero">
+        <div class="reveal">
+            <h1>Forum pour la Conscience et le Développement</h1>
+            <p>"Unis dans la conscience et dans la sueur nous bâtirons une patrie fière"</p>
+        </div>
+    </section>
+
+    <div class="container">
+        
+        <section class="content-block two-col reveal">
+            <div class="img-col">
+                <img src="https://focode.org/ethan/img/libert_bdi.jpg" alt="Pacifique Nininahazwe">
+                <p style="text-align:center; font-size:12px; margin-top:10px; color:#888;">Pacifique Nininahazwe, Président du FOCODE</p>
+            </div>
+            <div class="text-col">
+                <h2>Message de Bienvenue</h2>
+                <p>C'est avec un immense plaisir et une profonde gratitude que nous vous accueillons sur le site web du Forum pour la Conscience et le Développement (FOCODE). En tant qu'organisation résolument engagée en faveur de la promotion de la gouvernance démocratique et de l'État de droit, nous nous dédions à l'avancement de la justice sociale, de l'équité, de la diversité et de l'inclusion.</p>
+                <p>FOCODE incarne un engagement fervent pour une société où chaque citoyen, homme ou femme, ressent non seulement le respect qui lui est dû, mais se voit également valorisé en tant que membre à part entière de notre collectivité. Nous aspirons à un avenir où la sécurité de chacun est garantie.</p>
+                <p><strong>Bienvenue au FOCODE, où chaque contribution est précieuse.</strong></p>
+            </div>
+        </section>
+
+        <section class="content-block reveal">
+            <div class="cards-grid">
+                <div class="info-card">
+                    <div class="icon-box"><i class="fas fa-eye"></i></div>
+                    <h3>Notre Vision</h3>
+                    <p>Nous imaginons une nation burundaise où chaque citoyen est intégré et apprécié. Nous rêvons d'une société sans oppression ni discrimination, où chacun a des chances égales. Un Burundi où la peur et l'insécurité appartiennent au passé.</p>
+                </div>
+                <div class="info-card">
+                    <div class="icon-box"><i class="fas fa-gavel"></i></div>
+                    <h3>Notre Mission</h3>
+                    <p>Promouvoir activement la démocratie, l'état de droit, ainsi que le respect des libertés fondamentales. Nous défendons la justice sociale à travers des campagnes de sensibilisation, du plaidoyer et une offensive diplomatique constante.</p>
+                </div>
+                <div class="info-card">
+                    <div class="icon-box"><i class="fas fa-users"></i></div>
+                    <h3>Notre Action</h3>
+                    <p>Nous diffusons des messages d'alerte et effectuons des dénonciations fondées sur des informations crédibles. Nos actions sont soutenues par des analyses et des recherches approfondies menées par des experts chevronnés.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-block reveal">
+            <div class="text-center" style="text-align:center; margin-bottom:30px;">
+                <h2 style="color:var(--primary);">Contactez-nous</h2>
+                <p>Vos observations et commentaires sont précieux.</p>
+            </div>
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="email" class="form-control" placeholder="Votre adresse email">
+                </div>
+                <div class="form-group">
+                    <textarea rows="5" class="form-control" placeholder="Votre message..."></textarea>
+                </div>
+                <button type="button" class="btn-submit">ENVOYER</button>
+            </form>
+        </section>
+
+    </div>
+
+    <footer class="footer-action">
+        <p>Exclusive ownership of FOCODE © 2025. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://twitter.com/FOCODE_" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.facebook.com/FocodeAsblBurundi" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/focodeasbl/" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Loading Screen
+        window.addEventListener("load", function() {
+            const preloader = document.getElementById('preloader');
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            }, 600);
+        });
+
+        // Scroll Reveal
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+    </script>
+</body>
+</html>

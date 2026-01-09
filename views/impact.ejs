@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOCODE - Notre Impact</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root { 
+            --primary: #000000;
+            --accent: #800020; /* FOCODE Red (Urgency) */
+            --teal: #1f7a8c;    /* Justice/Hope */
+            --text-dark: #111111;
+            --bg-light: #fcfcfc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+
+        /* --- 1. HEADER (Compact) --- */
+        /* (Assuming you use the partial, but adding basic header styles here for standalone preview) */
+        header { background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        
+        /* --- 2. IMPACT HERO --- */
+        .impact-hero {
+            background: #111; color: white; padding: 100px 20px; text-align: center;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('/images/protest-bg.jpg'); /* Placeholder BG */
+            background-size: cover; background-position: center;
+        }
+        .hero-tag { background: var(--accent); color: white; padding: 5px 12px; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; display: inline-block; margin-bottom: 20px; }
+        .hero-title { font-size: 48px; font-weight: 800; margin-bottom: 15px; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 20px; color: #ccc; max-width: 700px; margin: 0 auto; line-height: 1.5; }
+
+        /* --- 3. THE SCOREBOARD (Key Stats) --- */
+        .stats-section { transform: translateY(-30px); position: relative; z-index: 10; padding: 0 20px; }
+        .stats-grid {
+            max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr);
+            background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .stat-item { padding: 40px 20px; text-align: center; border-right: 1px solid #eee; }
+        .stat-item:last-child { border-right: none; }
+        .stat-number { font-size: 42px; font-weight: 900; color: var(--accent); display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #555; letter-spacing: 0.5px; }
+        .stat-desc { font-size: 12px; color: #888; margin-top: 5px; }
+
+        /* --- 4. CAMPAIGN SPOTLIGHT: NDONDEZA --- */
+        .ndondeza-section { padding: 80px 20px; background: white; }
+        .ndondeza-container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .nd-badge { color: var(--accent); font-weight: 900; font-size: 14px; border-bottom: 2px solid var(--accent); display: inline-block; margin-bottom: 20px; }
+        .nd-title { font-size: 36px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
+        .nd-text { font-size: 16px; color: #555; margin-bottom: 20px; }
+        .nd-quote { border-left: 4px solid var(--accent); padding-left: 20px; font-style: italic; color: #333; margin: 30px 0; font-weight: 600; }
+        
+        /* The "Report Card" Visual */
+        .report-visual {
+            background: #f8f8f8; padding: 30px; border-radius: 4px; border: 1px solid #eee;
+            position: relative;
+        }
+        .report-visual::before {
+            content: ''; position: absolute; top: -10px; right: -10px; width: 100%; height: 100%;
+            border: 2px solid var(--accent); border-radius: 4px; z-index: -1;
+        }
+
+        /* --- 5. ADVOCACY PROCESS (Timeline) --- */
+        .process-section { background: #111; color: white; padding: 80px 20px; }
+        .process-title { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 60px; }
+        .process-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+        .process-step { position: relative; padding-top: 20px; }
+        .process-step::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 40px; height: 3px; background: var(--teal);
+        }
+        .p-number { font-size: 60px; font-weight: 900; color: #222; position: absolute; top: 10px; right: 0; z-index: 0; }
+        .p-content { position: relative; z-index: 1; }
+        .p-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: white; }
+        .p-desc { font-size: 14px; color: #aaa; }
+
+        /* --- 6. SUCCESS STORIES (Multimedia) --- */
+        .stories-section { padding: 80px 20px; }
+        .stories-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+        .story-card { background: white; border: 1px solid #eee; border-radius: 6px; padding: 30px; transition: transform 0.3s; }
+        .story-card:hover { transform: translateY(-5px); border-color: var(--teal); box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .s-icon { font-size: 24px; color: var(--teal); margin-bottom: 15px; }
+        .s-title { font-weight: 700; margin-bottom: 10px; font-size: 18px; }
+        .s-text { font-size: 14px; color: #666; }
+
+        /* --- 7. CTA --- */
+        .cta-section { background: #f4f4f4; padding: 80px 20px; text-align: center; }
+        .cta-btn { background: var(--accent); color: white; padding: 15px 40px; font-weight: bold; font-size: 18px; border-radius: 4px; display: inline-block; margin-top: 20px; }
+        
+        @media (max-width: 768px) {
+            .stats-grid, .ndondeza-container, .process-grid, .stories-grid { grid-template-columns: 1fr; }
+            .stat-item { border-right: none; border-bottom: 1px solid #eee; }
+            .hero-title { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/header') %>
+
+    <section class="impact-hero">
+        <div class="reveal">
+            <span class="hero-tag">Depuis 2015</span>
+            <h1 class="hero-title">Mesurer le Silence.<br>Exiger la Justice.</h1>
+            <p class="hero-subtitle">
+                Face à un État qui nie les faits, nous construisons une montagne de preuves.
+                Nos rapports ne sont pas de simples archives : ils sont les futurs dossiers de la justice pénale internationale.
+            </p>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-grid reveal">
+            <div class="stat-item">
+                <span class="stat-number">1 280+</span>
+                <span class="stat-label">Disparitions Forcées</span>
+                <div class="stat-desc">Documentées et transmises au GTDF de l'ONU</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">250+</span>
+                <span class="stat-label">Rapports Hebdomadaires</span>
+                <div class="stat-desc">Produits par la campagne NDONDEZA</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">50 000+</span>
+                <span class="stat-label">Pages de Preuves</span>
+                <div class="stat-desc">Archivées sur des serveurs sécurisés</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">10 Ans</span>
+                <span class="stat-label">De Lutte en Exil</span>
+                <div class="stat-desc">Sans jamais cesser d'émettre</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ndondeza-section">
+        <div class="ndondeza-container">
+            <div class="reveal">
+                <span class="nd-badge">NOTRE CAMPAGNE PHARE</span>
+                <h2 class="nd-title">NDONDEZA : "Aidez-moi à les retrouver"</h2>
+                <p class="nd-text">
+                    Lancée en 2016, la campagne <strong>NDONDEZA</strong> a brisé le tabou des disparitions forcées au Burundi. En documentant chaque cas avec une rigueur médico-légale (photo, identité, circonstances, auteurs présumés), nous avons transformé des "rumeurs" en dossiers juridiques.
+                </p>
+                <div class="nd-quote">
+                    "Depuis le lancement de NDONDEZA, aucun rapport sur le Burundi ne peut ignorer les disparitions forcées. Nous avons rendu visible l'invisible."
+                    <br><span style="font-size:12px; font-weight:normal; color:#888;">— Pacifique Nininahazwe, Président du FOCODE</span>
+                </div>
+                <a href="/library" style="font-weight:bold; color:var(--accent); text-decoration:underline;">Voir tous les rapports NDONDEZA →</a>
+            </div>
+
+            <div class="report-visual reveal" style="transition-delay: 0.2s;">
+                <h4 style="margin-bottom:15px; border-bottom:1px solid #ddd; padding-bottom:10px;">Dernier Signalement</h4>
+                <div style="display:flex; gap:15px; margin-bottom:15px;">
+                    <div style="width:80px; height:80px; background:#ddd; border-radius:4px;"></div> <div>
+                        <div style="font-weight:bold; color:#d90429;">ALERTE DISPARITION</div>
+                        <div style="font-size:14px;"><strong>Nom :</strong> [Anonymisé pour démo]</div>
+                        <div style="font-size:14px;"><strong>Lieu :</strong> Zone Cibitoke</div>
+                        <div style="font-size:14px;"><strong>Auteurs :</strong> Agents SNR (Immatriculation connue)</div>
+                    </div>
+                </div>
+                <p style="font-size:12px; color:#777;">
+                    *Ce dossier a été vérifié par trois sources indépendantes avant publication.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="process-section">
+        <h2 class="process-title reveal">De l'Alerte Terrain à l'ONU</h2>
+        <div class="process-grid">
+            <div class="process-step reveal" style="transition-delay: 0.1s;">
+                <span class="p-number">01</span>
+                <div class="p-content">
+                    <h4 class="p-title">Signalement Sécurisé</h4>
+                    <p class="p-desc">Notre réseau de <strong>monitoring souterrain</strong> nous envoie une alerte via des canaux chiffrés (Signal/Tor) dès qu'un enlèvement a lieu.</p>
+                </div>
+            </div>
+            <div class="process-step reveal" style="transition-delay: 0.2s;">
+                <span class="p-number">02</span>
+                <div class="p-content">
+                    <h4 class="p-title">Vérification Croisée</h4>
+                    <p class="p-desc">Une équipe d'analystes vérifie l'info auprès de la famille, des témoins et de sources administratives pour éviter la désinformation.</p>
+                </div>
+            </div>
+            <div class="process-step reveal" style="transition-delay: 0.3s;">
+                <span class="p-number">03</span>
+                <div class="p-content">
+                    <h4 class="p-title">Publication Immédiate</h4>
+                    <p class="p-desc">Nous publions une "Alerte SOS" pour tenter de sauver la victime tant qu'il est encore temps, mettant la pression sur les ravisseurs.</p>
+                </div>
+            </div>
+            <div class="process-step reveal" style="transition-delay: 0.4s;">
+                <span class="p-number">04</span>
+                <div class="p-content">
+                    <h4 class="p-title">Saisine Internationale</h4>
+                    <p class="p-desc">Le dossier complet est transmis au <strong>Groupe de Travail de l'ONU</strong> et à la CPI pour constituer la preuve des crimes contre l'humanité.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stories-section">
+        <div class="container">
+            <h2 class="section-header reveal" style="text-align:center; border:none; margin-bottom:40px; display:block;">Impact Concret</h2>
+            
+            <div class="stories-grid">
+                <div class="story-card reveal">
+                    <div class="s-icon"><i class="fas fa-file-contract"></i></div>
+                    <h3 class="s-title">Citations Officielles</h3>
+                    <p class="s-text">
+                        Nos données sont reprises dans les rapports annuels du <strong>Département d'État Américain</strong> et du Secrétaire Général de l'ONU, empêchant le gouvernement de nier la réalité.
+                    </p>
+                </div>
+
+                <div class="story-card reveal" style="transition-delay: 0.1s;">
+                    <div class="s-icon"><i class="fas fa-life-ring"></i></div>
+                    <h3 class="s-title">Vies Sauvées</h3>
+                    <p class="s-text">
+                        Dans au moins <strong>12 cas documentés</strong>, la publication rapide d'une alerte NDONDEZA a forcé la police à officialiser une détention secrète, sauvant la victime d'une exécution sommaire.
+                    </p>
+                </div>
+
+                <div class="story-card reveal" style="transition-delay: 0.2s;">
+                    <div class="s-icon"><i class="fas fa-gavel"></i></div>
+                    <h3 class="s-title">Sanctions Ciblées</h3>
+                    <p class="s-text">
+                        Grâce à l'identification précise des tortionnaires (noms, grades), l'Union Européenne et les USA ont pu établir des listes de sanctions individuelles basées sur nos preuves.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="reveal">
+            <h2 style="font-size:32px; font-weight:800; margin-bottom:15px;">Aidez-nous à documenter le prochain cas</h2>
+            <p style="max-width:600px; margin:0 auto; color:#666;">
+                Chaque enquête coûte des ressources (communication, sécurisation, vérification). Votre soutien est notre seule arme contre l'oubli.
+            </p>
+            <a href="/donate" class="cta-btn">FINANCER UNE ENQUÊTE</a>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        // Scroll Reveal
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 100;
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+    </script>
+</body>
+</html>

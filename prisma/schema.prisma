@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      String    @default("EDITOR") // ADMIN or EDITOR
+  createdAt DateTime  @default(now())
+  
+  // Relations
+  articlesCreated Article[] @relation("CreatedBy")
+  articlesEdited  Article[] @relation("EditedBy")
+}
+
+model Article {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  image     String?  // Main cover image
+  summary   String?  // Short text for grid view
+  html      String   // Full content
+  category  String   @default("NEWS") // "NEWS", "REPORT", "STATEMENT"
+  published Boolean  @default(true)
+  date      String?  // Display date string
+
+  publishedAt DateTime? 
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Audit Logs (Transparency)
+  authorId       Int?
+  author         User? @relation("CreatedBy", fields: [authorId], references: [id])
+  
+  lastEditedById Int?
+  editor         User? @relation("EditedBy", fields: [lastEditedById], references: [id])
+}
+
+model Session {
+  sid    String   @id
+  sess   Json     // The library expects 'sess', not 'data'
+  expire DateTime // The library expects 'expire', not 'expiresAt'
+
+  @@map("session") // Forces the table name to be lowercase "session"
+}

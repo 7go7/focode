@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FOCODE - Forum pour la Conscience et le Développement</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #000000;
+      --accent: #800020;
+      --text-dark: #111111;
+
+      --bg-light: #fcfcfc;
+      --bg-soft: #f6f7f8;
+
+      --border: #ececec;
+      --muted: #666;
+      --muted-2: #888;
+
+      --card: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      --shadow-2: 0 18px 50px rgba(0, 0, 0, 0.10);
+
+      --radius: 14px;
+      --radius-lg: 18px;
+
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: 0.25s;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Layout */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section {
+      padding: 72px 0;
+    }
+
+    /* --- LOADING SCREEN CSS --- */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .loader-content {
+      text-align: center;
+    }
+
+    .loader-logo {
+      font-size: 40px;
+      font-weight: 950;
+      letter-spacing: -1.5px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .loader-logo span {
+      color: var(--accent);
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 4px;
+      background: var(--accent);
+      margin: 0 auto;
+      border-radius: 10px;
+      animation: loadLine 1.2s ease-in-out forwards;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(0.98);
+      }
+    }
+
+    @keyframes loadLine {
+      0% {
+        width: 0;
+      }
+
+      100% {
+        width: 100px;
+      }
+    }
+
+    /* Subtle top language bar */
+    .topbar {
+      background: #111;
+      color: #ccc;
+      font-size: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1b1b1b;
+    }
+
+    .topbar .wrap {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .topbar a {
+      color: #bdbdbd;
+    }
+
+    .topbar a.active {
+      color: #fff;
+    }
+
+    .topbar a:hover {
+      color: #fff;
+    }
+
+    /* Utilities */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: 0.9s var(--ease);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(128, 0, 32, 0.10);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    /* Section headers */
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    .section-header h2 {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      line-height: 1.15;
+      position: relative;
+      padding-bottom: 6px;
+    }
+
+    .section-header h2::after {
+      content: "";
+      display: block;
+      width: 64px;
+      height: 4px;
+      background: var(--accent);
+      margin-top: 10px;
+      border-radius: 999px;
+    }
+
+    .section-header a.more {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #555;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .section-header a.more:hover {
+      color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 12px 24px rgba(128, 0, 32, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      background: #fff;
+      color: var(--accent);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-ghost:hover {
+      background: #fff;
+      color: #111;
+    }
+
+    .btn-outline-dark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-weight: 900;
+      color: #111;
+      font-size: 13px;
+    }
+
+    .btn-outline-dark:hover {
+      border-color: #ddd;
+      transform: translateY(-1px);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 0;
+      position: relative;
+      min-height: 640px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.86)),
+        url("/mainpicture.png");
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.02);
+    }
+
+    .hero .inner {
+      position: relative;
+      width: 100%;
+      padding: 88px 0 84px;
+      color: #fff;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: end;
+    }
+
+    .hero h1 {
+      font-size: 54px;
+      font-weight: 950;
+      letter-spacing: -1.2px;
+      line-height: 1.06;
+      text-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+      margin: 14px 0 16px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 760px;
+      color: rgba(255, 255, 255, 0.92);
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-card .kpi {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .kpi .box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .kpi .num {
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.5px;
+    }
+
+    .kpi .lab {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.78);
+      margin-top: 4px;
+    }
+
+    .hero-card small {
+      display: block;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    /* Identity / Pillars */
+    .pillars {
+      padding-top: 0;
+      margin-top: -46px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .pillar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 22px;
+      box-shadow: var(--shadow);
+      transition: 0.25s;
+      position: relative;
+    }
+
+    .pillar:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-2);
+    }
+
+    .pillar .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: rgba(128, 0, 32, 0.10);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 22px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(128, 0, 32, 0.18);
+    }
+
+    .pillar h3 {
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: -0.2px;
+      margin-bottom: 8px;
+    }
+
+    .pillar p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Ndondeza section */
+    .ndondeza {
+      background: #111;
+      color: #fff;
+      position: relative;
+    }
+
+    .ndondeza .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 26px;
+      align-items: center;
+    }
+
+    .ndondeza h2 {
+      font-size: 40px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+      margin: 12px 0 14px;
+    }
+
+    .ndondeza p {
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .case-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 16px;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.30);
+    }
+
+    .case-card img {
+      width: 96px;
+      height: 96px;
+      border-radius: 999px;
+      border: 3px solid var(--accent);
+      object-fit: cover;
+    }
+
+    .case-card .label {
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
+
+    .case-card h4 {
+      font-size: 20px;
+      font-weight: 950;
+      margin: 6px 0 4px;
+      letter-spacing: -0.4px;
+    }
+
+    .case-card .meta {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 12px;
+    }
+
+    /* Magazine */
+    .magazine {
+      background: var(--bg-soft);
+    }
+
+    .mag-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: 0.25s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-2);
+    }
+
+    .main-article .media {
+      height: 380px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-article .media img {
+      transition: 0.5s;
+    }
+
+    .main-article:hover .media img {
+      transform: scale(1.04);
+    }
+
+    .tag {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      background: var(--accent);
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-radius: 8px;
+    }
+
+    .card .content {
+      padding: 22px;
+    }
+
+    .card .content h3 {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.6px;
+      line-height: 1.22;
+      margin: 10px 0 10px;
+    }
+
+    .card .content .date {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card .content .excerpt {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .side-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .side-item {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 14px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: 0.25s;
+    }
+
+    .side-item:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-2);
+    }
+
+    .side-thumb {
+      width: 84px;
+      height: 84px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .side-meta {
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--accent);
+    }
+
+    .side-title {
+      margin-top: 6px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+      color: #111;
+    }
+
+    /* Reports */
+    .reports {
+      background: #fff;
+    }
+
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .report {
+      position: relative;
+      height: 360px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: 0.25s;
+      background: #000;
+    }
+
+    .report:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-2);
+    }
+
+    .report img {
+      opacity: 0.92;
+    }
+
+    .report .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.0) 60%);
+      display: flex;
+      align-items: flex-end;
+      padding: 18px;
+    }
+
+    .report .overlay .wrap {
+      width: 100%;
+      display: grid;
+      gap: 10px;
+    }
+
+    .report .title {
+      color: #fff;
+      font-weight: 900;
+      font-size: 15px;
+      line-height: 1.25;
+      letter-spacing: -0.2px;
+    }
+
+    .report .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      color: var(--accent);
+      font-weight: 950;
+      font-size: 12px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      border-radius: 10px;
+      width: fit-content;
+    }
+
+    /* Video block */
+    .video-block {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .video-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      min-height: 460px;
+    }
+
+    .video-text {
+      padding: 46px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .video-text h3 {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .video-text p {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .video-text a {
+      color: var(--accent);
+      font-weight: 950;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+    }
+
+    .video-text a:hover {
+      transform: translateY(-1px);
+    }
+
+    .video-frame {
+      position: relative;
+      background: #000;
+    }
+
+    .video-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Subscribe */
+    .subscribe {
+      background: var(--accent);
+      color: #fff;
+      text-align: center;
+      padding: 76px 0;
+    }
+
+    .subscribe h2 {
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -0.6px;
+      margin-bottom: 8px;
+    }
+
+    .subscribe p {
+      opacity: 0.92;
+      font-weight: 650;
+    }
+
+    .sub-form {
+      margin: 22px auto 0;
+      max-width: 560px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .sub-form input {
+      border: 0;
+      outline: none;
+      padding: 14px 14px;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .sub-form button {
+      border: 0;
+      cursor: pointer;
+      padding: 0 22px;
+      border-radius: 10px;
+      font-weight: 950;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      background: #111;
+      color: #fff;
+    }
+
+    .sub-form button:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    footer {
+      background: #111;
+      color: #fff;
+      padding: 72px 0 28px;
+    }
+
+    .foot-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 46px;
+    }
+
+    .brand h2 {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      margin-bottom: 10px;
+    }
+
+    .brand h2 span {
+      color: var(--accent);
+    }
+
+    .brand p {
+      color: #b0b0b0;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .foot-head {
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #777;
+      margin-bottom: 14px;
+    }
+
+    .foot-link {
+      display: block;
+      color: #c7c7c7;
+      font-weight: 650;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .foot-link:hover {
+      color: #fff;
+      transform: translateX(3px);
+    }
+
+    .social a {
+      display: inline-flex;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid #242424;
+      color: #cfcfcf;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+
+    .social a:hover {
+      color: #fff;
+      border-color: rgba(128, 0, 32, 0.55);
+    }
+
+    .foot-bottom {
+      border-top: 1px solid #222;
+      padding-top: 20px;
+      text-align: center;
+      color: #808080;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 44px;
+      }
+
+      .pillar-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ndondeza .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mag-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .reports-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .video-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .video-text {
+        padding: 28px;
+      }
+
+      .video-inner {
+        min-height: auto;
+      }
+
+      .video-frame {
+        height: 260px;
+      }
+
+      .foot-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      section {
+        padding: 58px 0;
+      }
+
+      .hero {
+        min-height: 560px;
+      }
+
+      .hero .inner {
+        padding: 74px 0 68px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .reports-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sub-form {
+        grid-template-columns: 1fr;
+      }
+
+      .sub-form button {
+        height: 48px;
+      }
+
+      .foot-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="preloader">
+    <div class="loader-content">
+      <div class="loader-logo">FOCODE<span>.</span></div>
+      <div class="loader-bar"></div>
+    </div>
+  </div>
+
+  <!-- Top Language Bar -->
+  <div class="topbar">
+    <div class="container">
+      <div class="wrap">
+        <a href="#">Kirundi</a>
+        <a href="#" class="active">Français</a>
+        <a href="#">English</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header include (keep your header partial) -->
+  <%- include('partials/header') %>
+
+  <%
+    // Safe defaults
+    const _featMain = (typeof featMain !== 'undefined' && featMain) ? featMain : null;
+    const _featSide = (typeof featSide !== 'undefined' && Array.isArray(featSide)) ? featSide : [];
+    const _gridItems = (typeof gridItems !== 'undefined' && Array.isArray(gridItems)) ? gridItems : [];
+  %>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="inner">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="reveal active">
+            <span class="pill"><i class="fa-solid fa-scale-balanced"></i> Justice & État de droit</span>
+            <h1>Action pour la Justice<br>et la Conscience</h1>
+            <p>
+              FOCODE documente les violations, assiste les victimes et plaide pour un État de droit au Burundi
+              depuis plus de 10 ans.
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <a href="/about" class="btn-main">Notre Mission <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="/reports" class="btn-outline-dark"><i class="fa-solid fa-file-lines"></i> Consulter nos
+                rapports</a>
+            </div>
+          </div>
+
+          <div class="hero-card reveal active">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+              <div style="font-weight:950; letter-spacing:-0.3px; font-size:16px;">Pourquoi FOCODE</div>
+              <span class="pill" style="background: rgba(255,255,255,0.10); color:#fff; border:1px solid rgba(255,255,255,0.12);">
+                <i class="fa-solid fa-shield"></i> Crédibilité
+              </span>
+            </div>
+
+            <div class="kpi">
+              <div class="box">
+                <div class="num">10+ ans</div>
+                <div class="lab">d’engagement</div>
+              </div>
+              <div class="box">
+                <div class="num">Alertes</div>
+                <div class="lab">documentées</div>
+              </div>
+            </div>
+
+            <small>
+              Transparence, preuves, et accompagnement des victimes. Nos contenus visent la vérité, la mémoire et la
+              justice.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section class="pillars">
+    <div class="container">
+      <div class="pillar-grid reveal">
+        <div class="pillar">
+          <div class="icon"><i class="fas fa-search"></i></div>
+          <h3>Documenter</h3>
+          <p>Enquêter et archiver chaque violation pour bâtir la mémoire et préparer la justice.</p>
+        </div>
+        <div class="pillar">
+          <div class="icon"><i class="fas fa-bullhorn"></i></div>
+          <h3>Plaidoyer</h3>
+          <p>Alerter la communauté internationale et exiger des comptes aux responsables.</p>
+        </div>
+        <div class="pillar">
+          <div class="icon"><i class="fas fa-hands-helping"></i></div>
+          <h3>Assistance</h3>
+          <p>Soutenir les familles des victimes et protéger les défenseurs en danger.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NDONDEZA -->
+  <section class="ndondeza">
+    <div class="container">
+      <div class="grid">
+        <div class="reveal">
+          <span class="pill"><i class="fa-solid fa-location-dot"></i> Campagne Ndondeza</span>
+          <h2>Contre l'Oubli,<br>Pour la Vérité.</h2>
+          <p>
+            La campagne Ndondeza ("Où est-il ?") documente chaque semaine les cas de disparitions forcées.
+            Nous ne cesserons jamais de chercher.
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <a href="https://ndondeza.org" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+              Base de Données Complète <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="/category/ndondeza" class="btn-ghost" style="border-color: rgba(255,255,255,0.20);">
+              Lire les mises à jour <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="case-card reveal">
+          <img src="https://focode.org/ethan/img/museremu.jpeg" alt="Jean Bigirimana" loading="lazy">
+          <div>
+            <div class="label">Anniversaire de disparition</div>
+            <h4>Jean Bigirimana</h4>
+            <div class="meta">Journaliste • Disparu le 22 Juil 2016</div>
+            <a href="/ndondeza/jean-bigirimana" class="btn-ghost" style="padding:10px 12px; border-radius:10px;">
+              Lire son histoire <i class="fa-solid fa-book-open"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAGAZINE -->
+  <section class="magazine" id="magazine">
+    <div class="container">
+      <div class="section-header">
+        <h2>FocodeMagazine</h2>
+        <a href="/page/1" class="more">Toutes les Dépêches <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <div class="mag-grid">
+        <% if (_featMain) { %>
+        <a href="/article/<%= _featMain.slug %>" class="card main-article reveal">
+          <div class="media">
+            <span class="tag">
+              <%= _featMain.category || 'Actualité' %>
+            </span>
+            <img src="<%= _featMain.image %>" alt="<%= _featMain.title %>" loading="lazy">
+          </div>
+          <div class="content">
+            <div class="date"><i class="far fa-clock"></i>
+              <%= _featMain.date %>
+            </div>
+            <h3>
+              <%= _featMain.title %>
+            </h3>
+            <% 
+                 // Get text, strip HTML tags, and truncate
+                 let rawText = _featMain.excerpt || _featMain.description || _featMain.content || '';
+                 let cleanText = rawText.replace(/<[^>]*>?/gm, ''); // Remove HTML tags
+                 let displayText = cleanText.length > 160 ? cleanText.substring(0, 160) + '...' : cleanText;
+              %>
+              
+              <% if (displayText) { %>
+                <div class="excerpt">
+                  <%= displayText %>
+                </div>
+              <% } %>
+          </div>
+        </a>
+        <% } else { %>
+        <div class="card reveal" style="padding:22px;">
+          <div style="font-weight:950; font-size:16px; margin-bottom:6px;">Aucune dépêche à afficher</div>
+          <div style="color:var(--muted); font-weight:600;">Vérifiez que <code>featMain</code> est bien fourni
+            par votre controller.</div>
+        </div>
+        <% } %>
+
+        <div class="side-list">
+          <% if (_featSide.length===0) { %>
+          <div class="side-item reveal">
+            <div style="grid-column: 1 / -1;">
+              <div style="font-weight:950;">Aucun article secondaire</div>
+              <div style="color:var(--muted); font-weight:600;">Vérifiez que <code>featSide</code> est un
+                tableau.</div>
+            </div>
+          </div>
+          <% } %>
+
+          <% _featSide.forEach((item, index)=> { %>
+          <a href="/article/<%= item.slug %>" class="side-item reveal" style="transition-delay:<%= index * 90 %>ms">
+            <div class="side-thumb">
+              <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+            </div>
+            <div>
+              <div class="side-meta">
+                <%= item.category || 'Actualité' %>
+              </div>
+              <div class="side-title">
+                <%= item.title %>
+              </div>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORTS -->
+  <section class="reports">
+    <div class="container">
+      <div class="section-header">
+        <h2>Rapports & Publications</h2>
+        <a href="/category/reports" class="more">Bibliothèque <i class="fas fa-book"></i></a>
+      </div>
+
+      <div class="reports-grid">
+        <% const reportsSlice=_gridItems.slice(3, 7); if (reportsSlice.length===0) { %>
+        <div class="card reveal" style="padding:22px; grid-column: 1 / -1;">
+          <div style="font-weight:950; font-size:16px; margin-bottom:6px;">Aucun rapport à afficher</div>
+          <div style="color:var(--muted); font-weight:600;">
+            Fournissez <code>gridItems</code> (tableau) depuis votre controller, ou ajustez la logique
+            <code>slice(3,7)</code>.
+          </div>
+        </div>
+        <% } %>
+
+        <% reportsSlice.forEach((item, idx)=> { %>
+        <a href="/article/<%= item.slug %>" class="report reveal" style="transition-delay:<%= idx * 90 %>ms">
+          <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+          <div class="overlay">
+            <div class="wrap">
+              <div class="title">
+                <%= item.title %>
+              </div>
+              <span class="cta">Lire le Rapport <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+          </div>
+        </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO -->
+  <section>
+    <div class="container">
+      <div class="video-block reveal">
+        <div class="video-inner">
+          <div class="video-text">
+            <span class="pill"><i class="fa-brands fa-youtube"></i> Chaîne Agahaze</span>
+            <h3>Enquêtes, témoignages et analyses</h3>
+            <p>
+              Retrouvez nos enquêtes vidéo, les témoignages des victimes et les analyses de nos experts sur notre
+              chaîne YouTube.
+            </p>
+            <a href="https://www.youtube.com/@AGAHAZETV" target="_blank" rel="noopener noreferrer">
+              Voir la chaîne YouTube <i class="fas fa-play-circle"></i>
+            </a>
+          </div>
+
+          <div class="video-frame">
+            <iframe loading="lazy" src="https://www.youtube.com/embed/videoseries?list=PLRGv1_j5qHfKSvy9YC1TeQ3pqxYjmnjlJ" allowfullscreen title="Playlist Agahaze TV"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBSCRIBE -->
+  <section class="subscribe">
+    <div class="container">
+      <h2>Restez Informé</h2>
+      <p>Recevez nos rapports d'enquête et nos alertes directement.</p>
+
+      <form action="/subscribe" method="POST" class="sub-form">
+        <input type="email" name="email" placeholder="Votre Email..." required aria-label="Votre email">
+        <button type="submit">S'INSCRIRE</button>
+      </form>
+
+      <div style="margin-top:10px; font-size:12px; opacity:0.9; font-weight:650;">
+        Nous respectons votre confidentialité.
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="foot-grid">
+        <div class="brand">
+          <h2>FOCODE<span>.</span></h2>
+          <p style="margin: 6px 0 18px;">
+            Forum pour la Conscience et le Développement. Unis pour bâtir une patrie fière.
+          </p>
+          <div class="social">
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <div class="foot-head">Organisation</div>
+          <a href="/about" class="foot-link">Qui sommes-nous</a>
+          <a href="/mission" class="foot-link">Vision & Mission</a>
+          <a href="/team" class="foot-link">Notre Équipe</a>
+          <a href="/contact" class="foot-link">Contact</a>
+        </div>
+
+        <div>
+          <div class="foot-head">Ressources</div>
+          <a href="/reports" class="foot-link">Rapports</a>
+          <a href="/security" class="foot-link">Guide de Sécurité</a>
+          <a href="/donate" class="foot-link" style="color:#fff; font-weight:950;">Faire un Don</a>
+        </div>
+
+        <div>
+          <div class="foot-head">Partenaires</div>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; color:#bdbdbd; font-weight:700;">
+            <span>DefendDefenders</span>
+            <span>CIVICUS</span>
+            <span>FIDH</span>
+            <span>OMCT</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot-bottom">
+        &copy; 2025 FOCODE. Tous droits réservés.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Reveal on scroll
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealOnScroll = () => {
+      const windowHeight = window.innerHeight;
+      revealElements.forEach((el) => {
+        const top = el.getBoundingClientRect().top;
+        if (top < windowHeight - 60) el.classList.add('active');
+      });
+    };
+    window.addEventListener('scroll', revealOnScroll, {
+      passive: true
+    });
+    revealOnScroll();
+
+    // Loading Screen Logic
+    window.addEventListener("load", function() {
+      const preloader = document.getElementById('preloader');
+      setTimeout(() => {
+        preloader.style.opacity = '0';
+        preloader.style.visibility = 'hidden';
+      }, 800);
+    });
+  </script>
+</body>
+
+</html>

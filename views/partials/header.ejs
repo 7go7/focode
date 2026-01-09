@@ -1,0 +1,176 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* --- DESKTOP STYLES (Standard V2) --- */
+    header { 
+        background: white; 
+        box-shadow: 0 1px 5px rgba(0,0,0,0.05); 
+        position: sticky; top: 0; z-index: 1000; 
+        border-bottom: 1px solid #eee;
+    }
+
+    .nav-container { 
+        max-width: 1200px; margin: 0 auto; 
+        display: flex; justify-content: space-between; ali<<<<<<<<<<<<gn-items: center; 
+        padding: 0 20px; 
+        height: 70px; /* Standard Desktop Height */
+        transition: height 0.3s ease;
+    }
+
+    /* LOGO */
+    .logo { 
+        font-size: 26px; font-weight: 900; color: var(--primary); 
+        letter-spacing: -1px; text-decoration: none; text-transform: uppercase; 
+        white-space: nowrap;
+
+    }
+    .logo span { color: var(--accent); }
+
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+
+    /* DESKTOP LINKS */
+    .nav-link {
+        font-weight: 700; font-size: 13px; color: #555; 
+        text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--primary); }
+
+    /* BUTTONS */
+    .btn-donate { 
+        background: var(--accent); color: white; 
+        padding: 10px 24px; 
+        font-weight: bold; border-radius: 4px; 
+        font-size: 13px; text-transform: uppercase; 
+        border: none; cursor: pointer; white-space: nowrap;
+    }
+    .btn-icon {
+        background: transparent; border: 1px solid #e0e0e0; color: #555;
+        width: 40px; height: 40px; border-radius: 4px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 18px; cursor: pointer;
+    }
+
+    /* DROPDOWN */
+    .menu-wrapper { position: relative; }
+    .dropdown {
+        position: absolute; top: 50px; right: -10px;
+        background: white; width: 220px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        border-radius: 8px; border: 1px solid #f0f0f0;
+        opacity: 0; visibility: hidden; transform: translateY(10px);
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); overflow: hidden;
+    }
+    .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown a { 
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 20px; border-bottom: 1px solid #f9f9f9; 
+        font-size: 14px; color: #333; font-weight: 600;
+    }
+    .dropdown a:active, .dropdown a:hover { background: #f9f9f9; color: var(--primary); }
+    .dropdown a i { width: 20px; text-align: center; color: #999; }
+
+    /* --- MOBILE OPTIMIZATIONS (Compact Header) --- */
+    @media (max-width: 768px) {
+        .nav-container { 
+            height: 55px; /* Much smaller height */
+            padding: 0 15px; 
+        }
+
+        .logo { font-size: 20px; } /* Smaller Logo */
+        
+        .nav-right { gap: 10px; } /* Tighter spacing */
+        
+        .nav-link { display: none; } /* Hide "Qui sommes-nous" text */
+
+        /* Compact Donate Button */
+        .btn-donate { 
+            padding: 6px 12px; 
+            font-size: 11px; 
+            border-radius: 3px;
+        }
+
+        /* Compact Icons */
+        .btn-icon {
+            width: 32px; height: 32px; /* Smaller square */
+            font-size: 14px;
+        }
+        
+        /* Adjust Dropdown position for smaller header */
+        .dropdown { top: 45px; width: 200px; }
+    }
+</style>
+
+<header>
+    <div class="nav-container">
+        
+        <div class="nav-left">
+            <% if (!isHome) { %>
+                <a href="javascript:history.back()" class="btn-icon" title="Retour">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            <% } %>
+        </div>
+
+        <% if (isHome) { %>
+            <div style="flex-grow: 1; display: flex; align-items: center;">
+                <a href="/" class="logo">FOCODE<span>.</span>ORG</a>
+            </div>
+        <% } else { %>
+            <div style="position: absolute; left: 50%; transform: translateX(-50%);">
+                <a href="/" class="logo">FOCODE<span>.</span></a>
+            </div>
+        <% } %>
+
+        <div class="nav-right">
+            
+            <a href="#" class="btn-donate">Donner</a>
+            
+            <% if (!isHome) { %>
+                <div class="menu-wrapper">
+                    <button class="btn-icon" onclick="toggleMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="dropdown" id="mainMenu">
+                        <a href="/"><i class="fas fa-home"></i> Accueil</a>
+                        <a href="/about"><i class="fas fa-users"></i> Qui sommes-nous</a>
+                        <a href="#"><i class="fas fa-heart" style="color:var(--accent)"></i> Faire un don</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="menu-wrapper mobile-only-menu">
+                    <button class="btn-icon" onclick="toggleMenu()" style="border:none;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                     <div class="dropdown" id="mainMenu">
+                        <a href="/about"><i class="fas fa-users"></i> Qui sommes-nous</a>
+                    </div>
+                </div>
+                
+                <style>
+                    .mobile-only-menu { display: none; }
+                    @media (max-width: 768px) { .mobile-only-menu { display: block; } }
+                </style>
+            <% } %>
+
+        </div>
+    </div>
+</header>
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById('mainMenu');
+        menu.classList.toggle('active');
+    }
+
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('mainMenu');
+        const btns = document.querySelectorAll('.btn-icon');
+        let clickedBtn = false;
+        btns.forEach(btn => { if(btn.contains(event.target)) clickedBtn = true; });
+        
+        if (menu && !menu.contains(event.target) && !clickedBtn) {
+            menu.classList.remove('active');
+        }
+    });
+</script>
