@@ -1028,9 +1028,23 @@
 
   <%
     // Safe defaults
-    const _featMain = (typeof featMain !== 'undefined' && featMain) ? featMain : null;
+    const _featMain = (typeof featMain !== 'undefined') ? featMain : null;
     const _featSide = (typeof featSide !== 'undefined' && Array.isArray(featSide)) ? featSide : [];
+    const _reports = (typeof reports !== 'undefined' && Array.isArray(reports)) ? reports : [];
     const _gridItems = (typeof gridItems !== 'undefined' && Array.isArray(gridItems)) ? gridItems : [];
+
+    // Helper: Clean Text for excerpts
+    function getExcerpt(item) {
+        if (!item) return '';
+        // Use summary if available, otherwise strip HTML from content
+        let text = item.summary || item.html || '';
+        return text.replace(/<[^>]*>?/gm, '').substring(0, 150).trim() + '...';
+    }
+
+    // Helper: Image Fallback
+    function getImg(item) {
+        return (item && item.image) ? item.image : 'https://focode.org/ethan/img/museremu.jpeg';
+    }
   %>
 
   <!-- HERO -->
@@ -1152,63 +1166,26 @@
         <% if (_featMain) { %>
         <a href="/article/<%= _featMain.slug %>" class="card main-article reveal">
           <div class="media">
-            <span class="tag">
-              <%= _featMain.category || 'Actualité' %>
-            </span>
-            <img src="<%= _featMain.image %>" alt="<%= _featMain.title %>" loading="lazy">
+            <span class="tag"><%= _featMain.category || 'Actualité' %></span>
+            <img src="<%= getImg(_featMain) %>" alt="Main News">
           </div>
           <div class="content">
-            <div class="date"><i class="far fa-clock"></i>
-              <%= _featMain.date %>
-            </div>
-            <h3>
-              <%= _featMain.title %>
-            </h3>
-            <% 
-                 // Get text, strip HTML tags, and truncate
-                 let rawText = _featMain.excerpt || _featMain.description || _featMain.content || '';
-                 let cleanText = rawText.replace(/<[^>]*>?/gm, ''); // Remove HTML tags
-                 let displayText = cleanText.length > 160 ? cleanText.substring(0, 160) + '...' : cleanText;
-              %>
-              
-              <% if (displayText) { %>
-                <div class="excerpt">
-                  <%= displayText %>
-                </div>
-              <% } %>
+            <div class="date"><i class="far fa-clock"></i> <%= _featMain.date %></div>
+            <h3><%= _featMain.title %></h3>
+            <div class="excerpt"><%= getExcerpt(_featMain) %></div>
           </div>
         </a>
-        <% } else { %>
-        <div class="card reveal" style="padding:22px;">
-          <div style="font-weight:950; font-size:16px; margin-bottom:6px;">Aucune dépêche à afficher</div>
-          <div style="color:var(--muted); font-weight:600;">Vérifiez que <code>featMain</code> est bien fourni
-            par votre controller.</div>
-        </div>
         <% } %>
 
         <div class="side-list">
-          <% if (_featSide.length===0) { %>
-          <div class="side-item reveal">
-            <div style="grid-column: 1 / -1;">
-              <div style="font-weight:950;">Aucun article secondaire</div>
-              <div style="color:var(--muted); font-weight:600;">Vérifiez que <code>featSide</code> est un
-                tableau.</div>
-            </div>
-          </div>
-          <% } %>
-
-          <% _featSide.forEach((item, index)=> { %>
-          <a href="/article/<%= item.slug %>" class="side-item reveal" style="transition-delay:<%= index * 90 %>ms">
+          <% _featSide.forEach((item, index) => { %>
+          <a href="/article/<%= item.slug %>" class="side-item reveal" style="transition-delay:<%= index * 100 %>ms">
             <div class="side-thumb">
-              <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+              <img src="<%= getImg(item) %>" alt="Thumb">
             </div>
             <div>
-              <div class="side-meta">
-                <%= item.category || 'Actualité' %>
-              </div>
-              <div class="side-title">
-                <%= item.title %>
-              </div>
+              <div class="side-meta"><%= item.category || 'News' %></div>
+              <div class="side-title"><%= item.title %></div>
             </div>
           </a>
           <% }) %>
@@ -1226,24 +1203,16 @@
       </div>
 
       <div class="reports-grid">
-        <% const reportsSlice=_gridItems.slice(3, 7); if (reportsSlice.length===0) { %>
-        <div class="card reveal" style="padding:22px; grid-column: 1 / -1;">
-          <div style="font-weight:950; font-size:16px; margin-bottom:6px;">Aucun rapport à afficher</div>
-          <div style="color:var(--muted); font-weight:600;">
-            Fournissez <code>gridItems</code> (tableau) depuis votre controller, ou ajustez la logique
-            <code>slice(3,7)</code>.
-          </div>
-        </div>
+        <% if (_reports.length === 0) { %>
+        <div style="grid-column:1/-1; padding:20px; color:#999; text-align:center;">Aucun rapport récent.</div>
         <% } %>
 
-        <% reportsSlice.forEach((item, idx)=> { %>
-        <a href="/article/<%= item.slug %>" class="report reveal" style="transition-delay:<%= idx * 90 %>ms">
-          <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+        <% _reports.forEach((item, idx) => { %>
+        <a href="/article/<%= item.slug %>" class="report reveal" style="transition-delay:<%= idx * 100 %>ms">
+          <img src="<%= getImg(item) %>" alt="Report Cover">
           <div class="overlay">
             <div class="wrap">
-              <div class="title">
-                <%= item.title %>
-              </div>
+              <div class="title"><%= item.title %></div>
               <span class="cta">Lire le Rapport <i class="fa-solid fa-arrow-right"></i></span>
             </div>
           </div>

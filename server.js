@@ -5,91 +5,169 @@ const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
 
+// --- SETUP ---
 const app = express();
 const prisma = new PrismaClient();
 const PORT = 3000;
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
-// --- CONFIGURATION ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); // Handle forms
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Session Setup (Login Memory)
+// Session
 app.use(session({
     store: new pgSession({ conObject: { connectionString: process.env.DATABASE_URL } }),
-    secret: 'focode_secret_key_change_me',
+    secret: 'focode_secure_secret_99',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }
 }));
 
-// Upload Setup (Images)
+// Uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'public/uploads/'),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage: storage });
 
-// Middleware: Protect Admin Routes
+// Middleware
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    // Default image fallback for views
+    res.locals.fallbackImage = 'https://focode.org/ethan/img/museremu.jpeg'; 
+    next();
+});
+
 function isAuthenticated(req, res, next) {
     if (req.session.userId) return next();
     res.redirect('/admin/login');
 }
 
-// Global Variables for Views
-app.use((req, res, next) => {
-    res.locals.user = req.session.user || null;
-    next();
-});
+function getImagePath(req) {
+    if (req.file) return '/uploads/' + req.file.filename;
+    if (req.body.imageUrl && req.body.imageUrl.trim() !== '') return req.body.imageUrl.trim();
+    return req.body.existingImage || '';
+}
 
-// --- PUBLIC ROUTES (Front Office) ---
+// --- PUBLIC ROUTES ---
 
 app.get('/', (req, res) => res.redirect('/page/1'));
 
+// MAIN PAGE LOGIC (Fixed)
 app.get('/page/:num', async (req, res) => {
-    const page = parseInt(req.params.num) || 1;
+    const page = Math.max(1, parseInt(req.params.num) || 1);
     const itemsPerPage = 9;
-    
-    // Get only PUBLISHED articles
-    const where = { published: true };
-    
-    const totalArticles = await prisma.article.count({ where });
-    const totalPages = Math.ceil((totalArticles - 6) / itemsPerPage); 
 
-    const allArticles = await prisma.article.findMany({
-        where,
-        orderBy: { id: 'asc' }, // Newest first
-        include: { author: true } // Include author name
-    });
+    try {
+        // 1. Fetch Reports (Specific Query for the Reports Section)
+        const recentReports = await prisma.article.findMany({
+            where: { published: true, category: 'REPORT' },
+            orderBy: { createdAt: 'desc' },
+            take: 4
+        });
 
-    // ... (Your existing Grid Logic here: hero, featured, gridItems) ...
-    // Placeholder to keep code short:
-    const hero = allArticles[0];
-    const featMain = allArticles[1];
-    const featSide = allArticles.slice(2, 6);
-    const gridItems = allArticles.slice(6 + (page-1)*itemsPerPage, 6 + page*itemsPerPage);
+        // 2. Fetch News (For Magazine Section)
+        const newsQuery = { published: true, category: { not: 'REPORT' } }; 
+        const totalNews = await prisma.article.count({ where: newsQuery });
+        const totalPages = Math.max(1, Math.ceil(totalNews / itemsPerPage));
 
-    res.render('index', { page, totalPages, hero, featMain, featSide, gridItems, isHome: true });
+        const newsItems = await prisma.article.findMany({
+            where: newsQuery,
+            orderBy: { createdAt: 'desc' }, // Fix: Newest First
+            skip: (page - 1) * itemsPerPage,
+            take: itemsPerPage,
+            include: { author: { select: { name: true } } }
+        });
+
+        // 3. Assign Slots (Safe slicing)
+        // Feature the first item, list the next 4
+        const featMain = newsItems.length > 0 ? newsItems[0] : null;
+        const featSide = newsItems.length > 1 ? newsItems.slice(1, 5) : [];
+        
+        // Grid gets the rest (if any) or simplified for pagination pages
+        // On page 1, we show Featured + Side. On page 2+, just a grid.
+        
+        res.render('index', { 
+            page, 
+            totalPages, 
+            reports: recentReports, // Pass reports explicitly
+            featMain, 
+            featSide, 
+            gridItems: newsItems, // Pass all fetched news for flexibility
+            isHome: true 
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Server Error");
+    }
 });
 
+// ARTICLE PAGE (Fixed Draft Security)
 app.get('/article/:slug', async (req, res) => {
     const article = await prisma.article.findUnique({
         where: { slug: req.params.slug },
-        include: { author: true, editor: true } // Get Author/Editor info
+        include: { author: { select: { name: true } } }
     });
-    if (article) res.render('article', { article, isHome: false });
-    else res.status(404).send("Not Found");
+
+    // Fix: Prevent access to unpublished articles (unless logged in)
+    const isAdmin = !!req.session.userId;
+    if (!article || (!article.published && !isAdmin)) {
+        return res.status(404).render('index', { 
+            page: 1, totalPages: 1, reports: [], featMain: null, featSide: [], gridItems: [], isHome: false 
+        }); // Ideally render a dedicated 404 page
+    }
+
+    res.render('article', { article, isHome: false });
 });
 
-app.get('/about', (req, res) => res.render('about', { isHome: false }));
+// --- MISSING ROUTES (Fixed 404s) ---
 
+// Reports Archive
+app.get('/category/reports', async (req, res) => {
+    const reports = await prisma.article.findMany({
+        where: { published: true, category: 'REPORT' },
+        orderBy: { createdAt: 'desc' }
+    });
+    res.render('index', { 
+        page: 1, totalPages: 1, 
+        reports: [], featMain: null, featSide: [], 
+        gridItems: reports, // Show reports in the main grid area
+        isHome: false,
+        sectionTitle: "Tous les Rapports"
+    });
+});
 
-// --- ADMIN ROUTES (Back Office) ---
+// General Categories (Ndondeza, etc)
+app.get('/category/:cat', async (req, res) => {
+    const catName = req.params.cat.toUpperCase();
+    const articles = await prisma.article.findMany({
+        where: { published: true, category: catName },
+        orderBy: { createdAt: 'desc' }
+    });
+    res.render('index', { 
+        page: 1, totalPages: 1, 
+        reports: [], featMain: null, featSide: [], 
+        gridItems: articles,
+        isHome: false,
+        sectionTitle: `Catégorie : ${req.params.cat}`
+    });
+});
 
-// 1. Login Page
+// Static Pages
+app.get('/about', (req, res) => res.render('about'));
+app.get('/contact', (req, res) => res.render('contact'));
+app.get('/reports', (req, res) => res.redirect('/category/reports'));
+
+// --- ADMIN ROUTES ---
+
 app.get('/admin/login', (req, res) => res.render('admin/login'));
 
 app.post('/admin/login', async (req, res) => {
@@ -98,7 +176,11 @@ app.post('/admin/login', async (req, res) => {
     
     if (user && await bcrypt.compare(password, user.password)) {
         req.session.userId = user.id;
-        req.session.user = user;
+        // Security: Remove password before storing in session
+        const safeUser = { ...user };
+        delete safeUser.password;
+        req.session.user = safeUser;
+        
         res.redirect('/admin/dashboard');
     } else {
         res.render('admin/login', { error: "Invalid Credentials" });
@@ -110,87 +192,79 @@ app.get('/admin/logout', (req, res) => {
     res.redirect('/admin/login');
 });
 
-// 2. Dashboard (List Articles)
 app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
     const articles = await prisma.article.findMany({
-        orderBy: { updatedAt: 'asc' },
-        include: { author: true, editor: true }
+        orderBy: { updatedAt: 'desc' },
+        include: { author: { select: { name: true } } }
     });
     res.render('admin/dashboard', { articles });
 });
 
-// 3. Create New
 app.get('/admin/new', isAuthenticated, (req, res) => res.render('admin/editor', { article: null }));
 
-function getImagePath(req) {
-    if (req.file) {
-        // Priority 1: User uploaded a new file
-        return '/uploads/' + req.file.filename;
-    } else if (req.body.imageUrl && req.body.imageUrl.trim() !== '') {
-        // Priority 2: User pasted a URL (http://...)
-        return req.body.imageUrl.trim();
-    } else {
-        // Priority 3: Keep existing image
-        return req.body.existingImage;
-    }
-}
-
-// 3. Create New
+// CREATE
 app.post('/admin/save', isAuthenticated, upload.single('image'), async (req, res) => {
-    const { title, html, category, date, slug, published } = req.body;
-    
-    // Use the helper
+    const { title, html, category, date, slug, published, summary } = req.body;
     const imagePath = getImagePath(req);
+    
+    // Logic: Auto-generate slug if empty
+    const finalSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
 
-    const finalSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    // Security: Sanitize HTML
+    const cleanHtml = DOMPurify.sanitize(html);
 
-    try {
-        await prisma.article.create({
-            data: {
-                title, html, category,
-                slug: finalSlug + '-' + Date.now(),
-                image: imagePath, // Saves URL or File path
-                date: date || new Date().toDateString(),
-                published: !!published,
-                authorId: req.session.userId
-            }
-        });
-        res.redirect('/admin/dashboard');
-    } catch (e) {
-        res.status(500).send("Error saving article: " + e.message);
-    }
+    await prisma.article.create({
+        data: {
+            title, 
+            html: cleanHtml, 
+            summary: summary || '', // Save summary
+            category,
+            slug: finalSlug, 
+            image: imagePath,
+            date: date || new Date().toDateString(),
+            published: !!published,
+            authorId: req.session.userId
+        }
+    });
+    res.redirect('/admin/dashboard');
 });
 
-// 4. Edit Existing
+// UPDATE
 app.get('/admin/edit/:id', isAuthenticated, async (req, res) => {
     const article = await prisma.article.findUnique({ where: { id: parseInt(req.params.id) } });
+    // TODO: Add check if user.role == ADMIN or user.id == article.authorId
     res.render('admin/editor', { article });
 });
 
 app.post('/admin/update/:id', isAuthenticated, upload.single('image'), async (req, res) => {
-    const { title, html, category, date, published } = req.body;
-    
-    // Use the helper
+    const { title, html, category, date, published, summary } = req.body;
     const imagePath = getImagePath(req);
+    const cleanHtml = DOMPurify.sanitize(html);
 
-    try {
-        await prisma.article.update({
-            where: { id: parseInt(req.params.id) },
-            data: {
-                title, html, category, 
-                image: imagePath, // Update image
-                date,
-                published: !!published,
-                lastEditedById: req.session.userId
-            }
-        });
-        res.redirect('/admin/dashboard');
-    } catch (e) {
-        res.status(500).send("Error updating article: " + e.message);
-    }
+    await prisma.article.update({
+        where: { id: parseInt(req.params.id) },
+        data: {
+            title, 
+            html: cleanHtml, 
+            summary,
+            category, 
+            image: imagePath, 
+            date,
+            published: !!published,
+            lastEditedById: req.session.userId
+        }
+    });
+    res.redirect('/admin/dashboard');
 });
 
-// 5. User Management (Admin Only)
+// DELETE (Added Feature)
+app.post('/admin/delete/:id', isAuthenticated, async (req, res) => {
+    if (req.session.user.role !== 'ADMIN') return res.status(403).send("Unauthorized");
+    await prisma.article.delete({ where: { id: parseInt(req.params.id) } });
+    res.redirect('/admin/dashboard');
+});
+
+// USER MANAGER
 app.get('/admin/users', isAuthenticated, async (req, res) => {
     if (req.session.user.role !== 'ADMIN') return res.redirect('/admin/dashboard');
     const users = await prisma.user.findMany();
@@ -201,57 +275,12 @@ app.post('/admin/users/create', isAuthenticated, async (req, res) => {
     if (req.session.user.role !== 'ADMIN') return res.status(403).send("Unauthorized");
     const { name, email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    
     try {
-        await prisma.user.create({
-            data: { name, email, password: hashedPassword, role }
-        });
+        await prisma.user.create({ data: { name, email, password: hashedPassword, role } });
         res.redirect('/admin/users');
     } catch(e) {
-        res.send("Error creating user (Email might exist)");
+        res.send("Error creating user.");
     }
 });
 
-// 1. Show Contact Page
-app.get('/contact', (req, res) => {
-    res.render('contact', { isHome: false, page: 'contact' });
-});
-
-// 2. Handle Contact Form Submission
-app.post('/contact', (req, res) => {
-    const { name, email, message } = req.body;
-    
-    // In a real app, you would send an email here using 'nodemailer'
-    console.log(`📩 NEW MESSAGE from ${name} (${email}): \n${message}`);
-    
-    // Redirect back to contact page (you can add ?success=true to show a popup)
-    res.redirect('/contact'); 
-});
-
-// 3. Handle Newsletter Subscription (from the footer/action strip)
-app.post('/subscribe', (req, res) => {
-    const { email } = req.body;
-    console.log(`🔔 NEW SUBSCRIBER: ${email}`);
-    // Save to your database here
-    res.redirect('back');
-});
-
-// 4. Secure Submission Placeholder (Whistleblowers)
-app.get('/secure-submission', (req, res) => {
-    // For now, redirect to contact or render a specific secure page instructions
-    res.render('contact', { isHome: false, page: 'secure' }); 
-});
-
-// 5. Donation Placeholder
-app.get('/don', (req, res) => {
-    res.render('don', { isHome: false, page: 'don' });
-});
-
-app.get('/impact', (req, res) => {
-    res.render('impact', { isHome:false, page: 'impact'});
-});
-
-
-app.listen(PORT, () => {
-    console.log(`🚀 CMS Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

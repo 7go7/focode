@@ -1,61 +1,77 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark px-4">
-        <a class="navbar-brand" href="#">FOCODE CMS</a>
-        <div>
-            <span class="text-white me-3">Welcome, <%= user.name %></span>
-            <% if(user.role === 'ADMIN') { %><a href="/admin/users" class="btn btn-sm btn-outline-light me-2">Manage Users</a><% } %>
-            <a href="/admin/logout" class="btn btn-sm btn-danger">Logout</a>
-        </div>
-    </nav>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Articles</h2>
-            <a href="/admin/new" class="btn btn-success">+ Create New</a>
-        </div>
-        
-        <div class="card shadow-sm">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Author</th>
-                        <th>Last Edit</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% articles.forEach(art => { %>
-                    <tr>
-                        <td><%= art.title %></td>
-                        <td><span class="badge bg-secondary"><%= art.category %></span></td>
-                        <td><%= art.author ? art.author.name : 'System' %></td>
-                        <td>
-                            <small class="text-muted">
-                                <%= art.editor ? art.editor.name : '-' %> 
-                                (<%= new Date(art.updatedAt).toLocaleDateString() %>)
-                            </small>
-                        </td>
-                        <td>
-                            <% if(art.published) { %><span class="badge bg-success">Live</span><% } else { %><span class="badge bg-warning">Draft</span><% } %>
-                        </td>
-                        <td>
-                            <a href="/admin/edit/<%= art.id %>" class="btn btn-sm btn-primary">Edit</a>
-                            <a href="/article/<%= art.slug %>" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>
-                        </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-dark px-4">
+    <a class="navbar-brand" href="#">FOCODE CMS</a>
+    <div>
+      <span class="text-white me-3">Welcome, <%= user.name %></span>
+      <% if(user.role === 'ADMIN') { %><a href="/admin/users" class="btn btn-sm btn-outline-light me-2">Manage Users</a><% } %>
+      <a href="/admin/logout" class="btn btn-sm btn-danger">Logout</a>
     </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Articles</h2>
+      <a href="/admin/new" class="btn btn-success">+ Create New</a>
+    </div>
+
+    <div class="card shadow-sm">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Author</th>
+            <th>Last Edit</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% articles.forEach(art => { %>
+          <tr>
+            <td><%= art.title %></td>
+            <td><span class="badge bg-secondary"><%= art.category %></span></td>
+            <td><%= art.author ? art.author.name : 'System' %></td>
+            <td>
+              <small class="text-muted">
+                <%= art.editor ? art.editor.name : '-' %>
+                (<%= new Date(art.updatedAt).toLocaleDateString() %>)
+              </small>
+            </td>
+            <td>
+              <% if(art.published) { %><span class="badge bg-success">Live</span><% } else { %><span class="badge bg-warning">Draft</span><% } %>
+            </td>
+            <td>
+              <a href="/admin/edit/<%= art.id %>" class="btn btn-sm btn-primary">Edit</a>
+              <a href="/article/<%= art.slug %>" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>
+            </td>
+
+            <td>
+              <a href="/admin/edit/<%= art.id %>" class="btn btn-sm btn-primary">Edit</a>
+              <a href="/article/<%= art.slug %>" target="_blank" class="btn btn-sm btn-outline-secondary">View</a>
+
+              <% if (user.role === 'ADMIN') { %>
+              <form action="/admin/delete/<%= art.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+              </form>
+              <% } %>
+            </td>
+
+
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
+
 </html>
